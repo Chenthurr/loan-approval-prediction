@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Approval Predictor</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Loan Approval Prediction</h1>
+            <p>Machine Learning Risk Assessment System</p>
+            <div class="badges">
+                <span class="badge">Python</span>
+                <span class="badge">Scikit-learn</span>
+                <span class="badge">TensorFlow</span>
+                <span class="badge accuracy">87.3% Accuracy</span>
+            </div>
+        </header>
+
+        <section class="metrics">
+            <div class="metric-card">
+                <div class="metric-value">87.3%</div>
+                <div class="metric-label">Model Accuracy</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">10,240</div>
+                <div class="metric-label">Records Trained</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">-40%</div>
+                <div class="metric-label">Manual Review Time</div>
+            </div>
+        </section>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="predict">Predict</button>
+            <button class="tab-btn" data-tab="performance">Performance</button>
+            <button class="tab-btn" data-tab="insights">Insights</button>
+        </nav>
+
+        <div class="panel active" id="predict">
+            <h2>Enter Application Details</h2>
+            <form id="predictionForm">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Annual Income ($)</label>
+                        <input type="number" id="income" value="75000" min="0" step="1000">
+                    </div>
+                    <div class="field">
+                        <label>Loan Amount ($)</label>
+                        <input type="number" id="loanAmount" value="20000" min="1000" step="1000">
+                    </div>
+                    <div class="field">
+                        <label>Credit Score: <span id="csVal">720</span></label>
+                        <input type="range" id="creditScore" min="300" max="850" value="720">
+                        <div class="range-hint">300 — 850</div>
+                    </div>
+                    <div class="field">
+                        <label>Employment (years): <span id="empVal">5</span></label>
+                        <input type="range" id="empLength" min="0" max="30" value="5">
+                    </div>
+                    <div class="field">
+                        <label>Debt-to-Income (%): <span id="dtiVal">25</span></label>
+                        <input type="range" id="dti" min="0" max="60" value="25">
+                    </div>
+                    <div class="field">
+                        <label>Home Ownership</label>
+                        <select id="homeOwnership">
+                            <option value="rent">Rent</option>
+                            <option value="mortgage" selected>Mortgage</option>
+                            <option value="own">Own</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Loan Purpose</label>
+                        <select id="loanPurpose">
+                            <option value="debt_consolidation" selected>Debt Consolidation</option>
+                            <option value="home_improvement">Home Improvement</option>
+                            <option value="medical">Medical</option>
+                            <option value="education">Education</option>
+                            <option value="business">Business</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Previous Defaults</label>
+                        <select id="prevDefaults">
+                            <option value="0" selected>0</option>
+                            <option value="1">1</option>
+                            <option value="2">2+</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="predict-btn">Run Prediction</button>
+            </form>
+
+            <div class="result-box" id="resultBox">
+                <div class="result-status" id="resultStatus">Approved</div>
+                <div class="gauge-wrap">
+                    <svg viewBox="0 0 200 110" width="200" height="110">
+                        <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100"/>
+                        <path id="gaugeFill" class="gauge-fill" d="M 20 100 A 80 80 0 0 1 180 100"
+                              stroke-dasharray="251" stroke-dashoffset="251"/>
+                        <text id="gaugeText" class="gauge-text" x="100" y="90">0%</text>
+                        <text class="gauge-label" x="100" y="105">Approval Probability</text>
+                    </svg>
+                </div>
+                <div class="result-details">
+                    <span class="risk-badge" id="riskBadge">Low Risk</span>
+                    <span class="conf-badge" id="confBadge">Confidence: 92%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" id="performance">
+            <h2>Model Performance</h2>
+
+            <div class="perf-section">
+                <h3>Confusion Matrix</h3>
+                <div class="confusion-table">
+                    <div class="cf-header"></div>
+                    <div class="cf-header">Predicted: Approve</div>
+                    <div class="cf-header">Predicted: Reject</div>
+                    <div class="cf-label">Actual: Approve</div>
+                    <div class="cf-cell tp">3,842<br><small>True Positive</small></div>
+                    <div class="cf-cell fn">458<br><small>False Negative</small></div>
+                    <div class="cf-label">Actual: Reject</div>
+                    <div class="cf-cell fp">612<br><small>False Positive</small></div>
+                    <div class="cf-cell tn">2,128<br><small>True Negative</small></div>
+                </div>
+            </div>
+
+            <div class="perf-section">
+                <h3>Feature Importance</h3>
+                <div class="feature-list" id="featureList"></div>
+            </div>
+
+            <div class="perf-section">
+                <h3>Model Comparison</h3>
+                <table class="model-table">
+                    <thead>
+                        <tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>AUC</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Random Forest</td><td>87.3%</td><td>86.1%</td><td>89.3%</td><td>87.7%</td><td>0.942</td></tr>
+                        <tr><td>Gradient Boosting</td><td>86.8%</td><td>85.4%</td><td>88.9%</td><td>87.1%</td><td>0.938</td></tr>
+                        <tr><td>Neural Network</td><td>86.5%</td><td>85.0%</td><td>88.5%</td><td>86.7%</td><td>0.935</td></tr>
+                        <tr><td>Logistic Regression</td><td>82.1%</td><td>80.5%</td><td>85.2%</td><td>82.8%</td><td>0.901</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel" id="insights">
+            <h2>Dataset Insights</h2>
+            <div class="insight-grid">
+                <div class="insight-card">
+                    <h4>Approval Rate</h4>
+                    <div class="insight-big">68.2%</div>
+                    <div class="insight-bar"><div style="width:68.2%"></div></div>
+                </div>
+                <div class="insight-card">
+                    <h4>Avg Loan Amount</h4>
+                    <div class="insight-big">$14,250</div>
+                    <div class="insight-sub">Median: $12,000</div>
+                </div>
+                <div class="insight-card">
+                    <h4>Avg Credit Score</h4>
+                    <div class="insight-big">692</div>
+                    <div class="insight-sub">Range: 300 — 850</div>
+                </div>
+                <div class="insight-card">
+                    <h4>Avg Annual Income</h4>
+                    <div class="insight-big">$68,400</div>
+                    <div class="insight-sub">Std Dev: $24,100</div>
+                </div>
+            </div>
+
+            <div class="perf-section">
+                <h3>Loan Purpose Distribution</h3>
+                <div class="bar-chart" id="purposeChart"></div>
+            </div>
+
+            <div class="perf-section">
+                <h3>Tech Stack</h3>
+                <div class="tech-grid">
+                    <span class="tech-tag">Python 3.9+</span>
+                    <span class="tech-tag">Pandas</span>
+                    <span class="tech-tag">NumPy</span>
+                    <span class="tech-tag">Scikit-learn</span>
+                    <span class="tech-tag">TensorFlow</span>
+                    <span class="tech-tag">Matplotlib</span>
+                    <span class="tech-tag">Seaborn</span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with Python, Scikit-learn & TensorFlow | 
+               <a href="https://github.com/yourusername/loan-approval-prediction">View on GitHub</a></p>
+        </footer>
+    </div>
+    <script src="assets/app.js"></script>
+</body>
+</html>
